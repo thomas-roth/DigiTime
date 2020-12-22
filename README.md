@@ -20,7 +20,7 @@ DigiTime uses Python and SQLite for its time tracking application and a mix of P
 DigiTime uses PyWin32 and PySimpleGUI for its time tracking application and Bootstrap, Chart.js, JQuery and the BoredAPI for its website.
 
 ## References
-[Youtube presentation](https://youtube.com)
+[Youtube presentation](https://www.youtube.com/channel/UCrZURQBza57OmAGmA8_g_-g/featured)
 
 [Github repository](https://github.com/crispyLok/DigiTime)
 
