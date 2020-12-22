@@ -1,0 +1,65 @@
+﻿body
+{
+    background-color: #1E1E1E;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Table */
+.table
+{
+    border-collapse: collapse;
+    margin: 25px 0px;
+    font-size: 0.9em;
+    min-width: 400px;
+    border-radius: 12px 12px 12px 12px;
+    overflow: hidden;
+    box-shadow: 0 0 20px #C59A6F;
+    color: #999999;
+}
+.table thead
+{
+    background-color: rgba(204, 204, 204, 0.1);
+    color: #C59A6F;
+    text-align: left;
+    font-weight: bolder;
+    font-size: 18px;
+}
+.table th,
+.table td
+{
+    padding: 8px 10px;
+    border-style: hidden;
+}
+.table tbody tr:hover
+{
+    background-color: rgba(204, 204, 204, 0.1);
+    color: #999999;
+}
+
+/* Navbar */
+.navbar
+{
+    font-size: 18px;
+    font-style: 900;
+}
+.dropdown-highlight:hover
+{
+    color: #FFFFFF !important;
+}
+
+/* Range slider */
+input[type="range"]
+{
+    background-color: #282828;
+    width: 400px;
+}
+input[type="range"]::-moz-range-progress
+{
+    background-color: #C59A6F;
+}
+input[type="range"]::-moz-range-track
+{  
+    background-color: #999999;
+}
