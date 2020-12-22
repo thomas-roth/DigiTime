@@ -1,0 +1,236 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <title>DigiTime</title>
+    <style>
+        body
+        {
+            background-image: url(../static/backgroundLeather.jpg);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!-- Navbar -->
+    <nav class="navbar fixed-top navbar-expand-md navbar-dark bg-dark" style="background-color: #282828 !important; height: 72px !important;">
+        <div class="container-fluid">
+            <!-- Left side -->
+            <ul class="navbar-nav">
+                <a class="navbar-brand" href="/" >
+                    <img src="../static/logo.png" alt="" width="40" height="35" class="d-inline-block align-center">
+                </a>
+                <div class="navbar-nav" id="navbarNavAltMarkup" style="align-self: center">
+                    <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    <a class="nav-link" href="/programUsage">Program usage</a>
+                    <a class="nav-link" href="/generalUsage">General usage</a>
+                </div>
+            </ul>
+            <!-- Right side -->
+            <ul class="navbav-nav" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                <li class="nav-item">
+                    <!-- Buttons for focus and break timer -->
+                    <button type="button" class="btn btn-dark" onclick="toggleFocusTimerMenu()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Timer for being productive">
+                        Focus Timer
+                    </button>
+                    <button type="button" class="btn btn-dark" onclick="toggleBreakTimerMenu()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Timer for taking a break">
+                        Break Timer
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Welcome header -->
+    <div id="welcomeHeader" style="text-align: center; margin-top: 300px;">
+        <h1 style="color: #FFFFFF;">
+            Welcome to DigiTime!
+        </h1>
+        <h4 style="color: #999999">
+            The site to manage your digital health
+        </h4>
+    </div>
+    
+    <!-- Menu for focus timer -->
+    <div id="focusTimerMenu" style="position: relative; padding-left: 40%; padding-right: 40%; padding-top: 10%; padding-bottom: 10%; width: 400px; color: #999999; font-size: 20px;">
+        <div id="focusRangeBubble" style="width: 400px; text-align: center;">Be productive for 60 minutes</div>
+        <form onsubmit="startStopFocusTimer();return false">
+            <input id="focusTimerFormMinutes" type="range" name="min" min="5" max="120" step="5" value="60">
+            <label for="focusTimerFormNotifyMe" style="width: 400px; padding-bottom: 10px;">
+                <input id="focusTimerFormNotifyMe" type="checkbox" checked style="width: 40px; height: 15px; vertical-align: middle;">
+                Notify Me!
+            </label>
+            <input type="submit" value="Start focus timer">
+        </form>
+    </div>
+    <!-- Menu for break timer -->
+    <div id="breakTimerMenu" style="position: relative; padding-left: 40%; padding-right: 40%; padding-top: 10%; padding-bottom: 10%; width: 400px; color: #999999; font-size: 20px;">
+        <div id="breakRangeBubble" style="width: 400px; text-align: center;">Take a break for 60 minutes</div>
+        <form onsubmit="startStopBreakTimer();return false">
+            <input id="breakTimerFormMinutes" type="range" name="min" min="5" max="120" step="5" value="60">
+            <label for="breakTimerFormNotifyMe" style="width: 400px; padding-bottom: 10px;">
+                <input id="breakTimerFormNotifyMe" type="checkbox" checked style="width: 40px; height: 15px; vertical-align: middle;">
+                Notify Me!
+            </label>
+            <input type="submit" value="Start break timer">
+        </form>
+    </div>
+
+    <!-- Div for bored API call -->
+    <div class="container-fluid" style="position: absolute; bottom: 50px; text-align: center;">
+        <h2></h2>
+        <div id="seenEverything"  style="color: #FFFFFF;">
+            Seen everything and now you're bored? Try this:
+        </div>
+        <div id="boredActivity" style="color: #999999;"></div>
+    </div>
+
+    <script>
+        // Script to initialize all tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Script to load random activity from Bored API on page load
+        $(document).ready(function() {
+            $.ajax({
+                url: "http://www.boredapi.com/api/activity/",
+                type: "GET",
+                success: function(result) {
+                    // Get data from API call
+                    var activity = result.activity;
+                    var link = result.link;
+                    var participants = result.participants;
+                    
+                    // Display data
+                    if (participants > 2) {
+                        if (link != "") {
+                            document.getElementById('boredActivity').innerHTML = activity + "<br><span style='font-size: 12px'>(but maybe wait for COVID-19 to calm down)</span><br><a style='color: #C59A6F' href='" + link + "'>Here's a link to start</a>";
+                        }
+                        else {
+                            document.getElementById('boredActivity').innerHTML = activity + "<br><span style='font-size: 12px'>(but maybe wait for COVID-19 to calm down)</span>";
+                        }
+                    }
+                    else {
+                        if (link != "") {
+                            document.getElementById('boredActivity').innerHTML = activity + "<br><a style='color: #C59A6F' href='" + link + "'>Here's a link to start</a>";
+                        }
+                        else {
+                            document.getElementById('boredActivity').innerHTML = activity;
+                        }
+                    }
+                },
+                error: function(error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
+
+        // Script to toggle the menu for the focus timer
+        $('#focusTimerMenu').hide();
+        function toggleFocusTimerMenu() {
+            if ($('#breakTimerMenu').is(':hidden')) {
+                if (document.getElementById('welcomeHeader').style.marginTop == "300px") {
+                    // Move welcome header up (to make space for menu)
+                    document.getElementById('welcomeHeader').style.marginTop = "200px";
+    
+                    // Show timer menu
+                    $('#focusTimerMenu').show();  
+                }
+                else {
+                    // Move welcome header back down
+                    document.getElementById('welcomeHeader').style.marginTop = "300px";
+    
+                    // Hide timer menu
+                    $('#focusTimerMenu').hide();
+                }
+            }
+            else {
+                // Switch break timer for focus timer
+                $('#breakTimerMenu').hide();
+                $('#focusTimerMenu').show();  
+            }
+        }
+
+        // Script to toggle the menu for the break timer
+        $('#breakTimerMenu').hide();
+        function toggleBreakTimerMenu() {
+            if ($('#focusTimerMenu').is(':hidden')) {
+                if (document.getElementById('welcomeHeader').style.marginTop == "300px") {
+                    // Move welcome header up (to make space for menu)
+                    document.getElementById('welcomeHeader').style.marginTop = "200px";
+    
+                    // Show timer menu
+                    $('#breakTimerMenu').show();  
+                }
+                else {
+                    // Move welcome header back down
+                    document.getElementById('welcomeHeader').style.marginTop = "300px";
+    
+                    // Hide timer menu
+                    $('#breakTimerMenu').hide();
+                }
+            }
+            else {
+                // Switch focus timer for break timer
+                $('#focusTimerMenu').hide();
+                $('#breakTimerMenu').show();
+            }
+        }
+
+        // Script to start and stop the focus timer
+        function startStopFocusTimer() {
+            // Get user input from form
+            var timerMinutes = document.getElementById('focusTimerFormMinutes').value;
+            var timerMilliseconds = timerMinutes * 60 * 1000;
+            var notifyMeIsChecked = document.getElementById('focusTimerFormNotifyMe').checked;
+
+            // Sound if notify me is checked
+            if (notifyMeIsChecked) {
+                var notificationSound = new Audio('../static/NotificationSound.mp3')
+            }
+            
+            // Wait for timer to finish, then notify the user
+            var timeoutId = setTimeout(function() {
+                if (notifyMeIsChecked) {
+                    notificationSound.play();
+                }
+                alert("You were productive for " + timerMinutes + " minutes. Time for a break!");
+            }, timerMilliseconds);
+        }
+
+        // Script to start and stop the break timer
+        function startStopBreakTimer() {
+            // Get user input from form
+            var timerMinutes = document.getElementById('breakTimerFormMinutes').value;
+            var timerMilliseconds = timerMinutes * 60 * 1000;
+            var notifyMeIsChecked = document.getElementById('breakTimerFormNotifyMe').checked;
+
+            // Sound if notify me is checked
+            if (notifyMeIsChecked) {
+                var notificationSound = new Audio('../static/NotificationSound.mp3')
+            }
+            
+            // Wait for timer to finish, then notify the user
+            var timeoutId = setTimeout(function() {
+                if (notifyMeIsChecked) {
+                    notificationSound.play();
+                }
+                alert("You had a break for " + timerMinutes + " minutes. Time for some work!");
+            }, timerMilliseconds);
+        }
+
+        // Script to set bubble of range slider
+        var focusSlider = document.getElementById('focusTimerFormMinutes');
+        var focusBubble = document.getElementById('focusRangeBubble');
+        var breakSlider = document.getElementById('breakTimerFormMinutes');
+        var breakBubble = document.getElementById('breakRangeBubble');
+
+        focusSlider.addEventListener("input", () => {
+            focusBubble.innerHTML = "Be productive for " + focusSlider.value + " minutes";
+        });
+        breakSlider.addEventListener("input", () => {
+            breakBubble.innerHTML = "Take a break for " + breakSlider.value + " minutes";
+        });
+    </script>
+{% endblock %}

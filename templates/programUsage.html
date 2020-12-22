@@ -1,0 +1,193 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <title>DigiTime</title>
+{% endblock %}
+
+{% block body %}
+    <!-- Navbar -->
+    <nav class="navbar fixed-top navbar-expand-md navbar-dark bg-dark" style="background-color: #282828 !important;">
+        <div class="container-fluid">
+            <!-- Left side -->
+            <ul class="navbar-nav">
+                <a class="navbar-brand" href="/" >
+                    <img src="../static/logo.png" alt="" width="40" height="35" class="d-inline-block align-center">
+                </a>
+                <div class="navbar-nav" id="navbarNavAltMarkup" style="align-self: center">
+                    <a class="nav-link" href="/">Home</a>
+                    <a class="nav-link active" aria-current="page" href="/programUsage">Program usage</a>
+                    <a class="nav-link" href="/generalUsage">General usage</a>
+                </div>
+            </ul>
+            <!-- Right side (Icon for filters) -->
+            <ul class="navbav-nav" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                <li class="nav-item-dropdown">
+                    <a class="nav-link dropdown-toggle dropdown-highlight" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #999999;">
+                        Filters
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" style="padding: 10px; background-color: #282828 !important; color: #ffffff" onchange="toggleSubmitButton()">
+                        <!-- Filter to show time spent on programs for today -->
+                        <li>
+                            <div class="form-check" onclick="applyFilterToday()">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+                                <label class="form-check-label" for="flexRadioDefault1">
+                                    Today
+                                </label>
+                            </div>
+                        </li>
+                        <!-- Filter to show time spent on programs for the last seven days -->
+                        <li>
+                            <div class="form-check" onclick="applyFilterLastSevenDays()">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                                <label class="form-check-label" for="flexRadioDefault2">
+                                    Last seven days
+                                </label>
+                            </div>
+                        </li>
+                        <!-- Filter to show time spent on programs for the last thirty days -->
+                        <li>
+                            <div class="form-check" onclick="applyFilterLastThirtyDays()">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
+                                <label class="form-check-label" for="flexRadioDefault3">
+                                    Last thirty days
+                                </label>
+                            </div>
+                        </li>
+                        <!-- Filter to show time spent on programs for specified timeframe -->
+                        <li>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault4">
+                                <label class="form-check-label" for="flexRadioDefault4">
+                                    <form id="formFilters" action="javascript:void(0);" onsubmit="applyFilterStartEnd()">
+                                        <label for="startTime">
+                                            Start time:
+                                        </label>
+                                        <input type="date" id="startTime" name="startTime">
+                                        <label for="endTime">
+                                            End time:
+                                        </label>
+                                        <input type="date" id="endTime" name="endTime">
+                                        <input type="submit" id="submitButton" value="Apply" disabled>
+                                    </form>
+                                </label>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Donut chart -->
+    <div style="width: 1250px; padding-top: 100px; margin: auto;">
+        <canvas id="donutChart" width="75" height="50" class="col-md-8" style="margin: auto"></canvas>
+    </div>
+    <script src="../static/programUsage.js"></script>
+
+    <!-- Table -->
+    <div class="col-md-10" style="margin: auto">
+        <table id="table" class="table"></table>
+    </div>
+
+    <script>
+        // Script to show submit button of the startTime endTime form
+        // On page reload
+        document.getElementById("submitButton").disabled = true;
+        function toggleSubmitButton() {
+            if (document.getElementById("flexRadioDefault4").checked == true) {
+                if (document.getElementById("submitButton").disabled == true) {
+                    document.getElementById("submitButton").disabled = false;
+                }
+            }
+            else {
+                if (document.getElementById("submitButton").disabled == false) {
+                    document.getElementById("submitButton").disabled = true;
+                }
+            }
+        }
+
+        // Script to show data from today in the donut chart
+        function applyFilterToday() {
+            // Update chart data (null to get default dates)
+            fillChart(null, null);
+        }
+
+        // Script to show data from the last seven days in the donut chart
+        function applyFilterLastSevenDays() {
+            // Get current date and date 7 days ago
+            var currentDatetime = new Date();
+            var endDate = new Date(currentDatetime.getFullYear(), currentDatetime.getMonth(), currentDatetime.getDate(), 0, 0, 0);
+            var startDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - 6, 0, 0, 0);
+
+            // Update chart data
+            fillChart(startDate, endDate);
+        }
+
+        // Script to show data from the last thirty days in the donut chart
+        function applyFilterLastThirtyDays() {
+            // Get current date and date 30 days ago
+            var currentDatetime = new Date();
+            var endDate = new Date(currentDatetime.getFullYear(), currentDatetime.getMonth(), currentDatetime.getDate(), 0, 0, 0);
+            var startDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - 29, 0, 0, 0);
+
+            // Update chart data
+            fillChart(startDate, endDate);
+        }
+
+        // Script to show data from specified start- and enddate in the donut chart
+        function applyFilterStartEnd() {
+            // Get form data and transform strings into dates
+            var formData = $('#formFilters').serializeArray();
+            startTime = formData[0]["value"];
+            endTime = formData[1]["value"];
+            
+            if (startTime == "") {
+                startDate = null;
+            }
+            else {
+                startDate = new Date(startTime);
+            }
+            if (endTime == "") {
+                endDate = null;
+            }
+            else {
+                endDate = new Date(endTime);
+            }
+
+            // Update chart data
+            fillChart(startDate, endDate);
+        }
+
+        // Script to check whether html page was loaded with given date (if so: filter donut chart for given date)
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get date param from URL (null if none specified)
+            var windowLocation = window.location.href;
+            var url = new URL(windowLocation);
+            var urlParams = new URLSearchParams(url.search);
+            var dateString = urlParams.get('date');
+            
+            // Turn date param from string into date formatted in local time zone at 00:00:00
+            var dateDate = new Date(dateString);
+            dateDate = new Date(dateDate.getTime() + dateDate.getTimezoneOffset() * 60000);
+            console.log("Given date: " + dateDate);
+
+            // Automatically set filter to specified date if given
+            if (dateString != null) {
+                $('#navbarDropdownMenuLink').click();
+                // Get today's date
+                var currentDatetime = new Date();
+                var dateToday = new Date(currentDatetime.getFullYear(), currentDatetime.getMonth(), currentDatetime.getDate(), 0, 0, 0);
+                console.log("Date today: " + dateToday);
+                // If specified date is today: click "Today" radio; else: click form radio
+                if (dateDate.getTime() == dateToday.getTime()) {
+                    $('#flexRadioDefault1').click();
+                }
+                else {
+                    $('#flexRadioDefault4').click();
+                    $('#startTime, #endTime').val(dateString);
+                    $('#submitButton').click();
+                }
+            }
+        });
+    </script>
+{% endblock %}

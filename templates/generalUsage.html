@@ -1,0 +1,139 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <title>DigiTime</title>
+{% endblock %}
+
+{% block body %}
+    <!-- Navbar -->
+    <nav class="navbar fixed-top navbar-expand-md navbar-dark bg-dark" style="background-color: #282828 !important;">
+        <div class="container-fluid">
+            <!-- Left side -->
+            <ul class="navbar-nav">
+                <a class="navbar-brand" href="/" >
+                    <img src="../static/logo.png" alt="" width="40" height="35" class="d-inline-block align-center">
+                </a>
+                <div class="navbar-nav" id="navbarNavAltMarkup" style="align-self: center">
+                    <a class="nav-link" href="/">Home</a>
+                    <a class="nav-link" href="/programUsage">Program usage</a>
+                    <a class="nav-link active" aria-current="page" href="/generalUsage">General usage</a>
+                </div>
+            </ul>
+            <!-- Right side (Icon for filters) -->
+            <ul class="navbav-nav" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                <li class="nav-item-dropdown">
+                    <a class="nav-link dropdown-toggle dropdown-highlight" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #999999;">
+                        Filters
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" style="padding: 10px; background-color: #282828 !important; color: #ffffff" onchange="toggleSubmitButton()">
+                        <!-- Filter to show time spent on programs for today -->
+                        <li>
+                            <!-- Filter to show time spent in the last seven days -->
+                            <div class="form-check" onclick="applyFilterLastSevenDays()">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+                                <label class="form-check-label" for="flexRadioDefault1">
+                                    Last seven days
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <!-- Filter to show time spent in the last thirty days -->
+                            <div class="form-check" onclick="applyFilterLastThirtyDays()">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                                <label class="form-check-label" for="flexRadioDefault2">
+                                    Last thirty days
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <!-- Filter to show time spent in specified timeframe -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
+                                <label class="form-check-label" for="flexRadioDefault3">
+                                    <form id="formFilters" action="javascript:void(0);" onsubmit="applyFilterStartEnd()">
+                                        <label for="startTime">
+                                            Start time:
+                                        </label>
+                                        <input type="date" id="startTime" name="startTime">
+                                        <label for="endTime">
+                                            End time:
+                                        </label>
+                                        <input type="date" id="endTime" name="endTime">
+                                        <input type="submit" id="submitButton" value="Apply" disabled>
+                                    </form>
+                                </label>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Bar chart -->
+    <div style="height: 850px; width: 90%; padding-top: 100px; margin: auto;">    
+        <canvas id="barChart" height="200" width="1000"></canvas>
+    </div>
+    <script src="../static/generalUsage.js"></script>
+
+
+    <script>
+        // Script to show submit button of the startTime endTime form
+        // On page reload
+        document.getElementById("submitButton").disabled = true;
+        document.getElementById("formFilters").reset();
+        function toggleSubmitButton() {
+            if (document.getElementById("flexRadioDefault3").checked == true) {
+                if (document.getElementById("submitButton").disabled == true) {
+                    document.getElementById("submitButton").disabled = false;
+                }
+            }
+            else {
+                if (document.getElementById("submitButton").disabled == false) {
+                    document.getElementById("submitButton").disabled = true;
+                }
+            }
+        }
+
+        // Script to show data from the last seven days in the bar chart
+        function applyFilterLastSevenDays() {
+            // Update chart data (null to get default dates)
+            fillChart(null, null);
+        }
+
+        // Script to show data from the last thirty days in the bar chart
+        function applyFilterLastThirtyDays() {
+            // Get current date and date 30 days ago
+            var currentDatetime = new Date();
+            var endDate = new Date(currentDatetime.getFullYear(), currentDatetime.getMonth(), currentDatetime.getDate(), 0, 0, 0);
+            var startDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - 29, 0, 0, 0);
+
+            // Update chart data
+            fillChart(startDate, endDate);
+        }
+
+        // Script to show data from specified start- and enddate in the bar chart
+        function applyFilterStartEnd() {
+            // Get form data and transform strings into dates
+            var formData = $('#formFilters').serializeArray();
+            startTime = formData[0]["value"];
+            endTime = formData[1]["value"];
+            
+            if (startTime == "") {
+                startDate = null;
+            }
+            else {
+                startDate = new Date(startTime);
+            }
+            if (endTime == "") {
+                endDate = null;
+            }
+            else {
+                endDate = new Date(endTime);
+            }
+
+            // Update chart data
+            fillChart(startDate, endDate);
+        }
+    </script>
+{% endblock %}
