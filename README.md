@@ -22,6 +22,6 @@ DigiTime uses PyWin32 and PySimpleGUI for its time tracking application and Boot
 ## References
 [Youtube presentation](https://youtube.com)
 
-[Github repository](https://github.com)
+[Github repository](https://github.com/crispyLok/DigiTime)
 
 # This was CS50.
