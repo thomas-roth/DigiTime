@@ -1,0 +1,5 @@
+cd C:\Users\Thomas2\bwSyncShare\DigiTime_GitHub\DigiTime-main
+pyinstaller --noconsole --onefile --icon="static\logo.ico" backgroundTimer.py
+
+console edition:
+pyinstaller --onefile --icon="static\logo.ico" backgroundTimer.py
